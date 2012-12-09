@@ -3,6 +3,7 @@
  * This behavior allows to save model with INSERT DELAYED query
  * Author: Anatoly Rugalev <anatoly.rugalev@gmail.com>
  * Github: http://github.com/AnatolyRugalev/yii-insertDelayedBehavior
+ * Version: 0.1
  */ 
 class InsertDelayedBehavior extends CBehavior {
     /**
