@@ -5,6 +5,7 @@ This behavior allows to save model with INSERT DELAYED query to save some execut
 
 Usage:
 Model.php
+```php
 public function behaviors()
 {
   return array(
@@ -13,3 +14,4 @@ public function behaviors()
     );
   );
 }
+```
