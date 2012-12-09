@@ -1,1 +1,17 @@
-This file was created by JetBrains PhpStorm (PhpStorm) PS-123.66 for binding GitHub repository
+yii-insertDelayedBehavior
+=========================
+
+This behavior allows to save model with INSERT DELAYED query to save some execution time.
+
+Usage:
+Model.php
+```php
+public function behaviors()
+{
+  return array(
+    'saveDelayed' => array(
+      'class' => 'application.behaviors.'
+    );
+  );
+}
+```
