@@ -1,9 +1,10 @@
 <?php
 /**
  * This behavior allows to save model with INSERT DELAYED query
- * Author: Anatoly Rugalev <anatoly.rugalev@gmail.com>
- * Github: http://github.com/AnatolyRugalev/yii-insertDelayedBehavior
- * Version: 0.1.1
+ * @author Anatoly Rugalev <anatoly.rugalev@gmail.com>
+ * @author Muhammad Shoaib <shoaibi@bitesource.com>
+ * @link http://github.com/AnatolyRugalev/yii-insertDelayedBehavior
+ * @version 0.2
  */
 class InsertDelayedBehavior extends CActiveRecordBehavior
 {
@@ -36,7 +37,7 @@ class InsertDelayedBehavior extends CActiveRecordBehavior
 			throw new CDbException(Yii::t('yii', 'The active record cannot be inserted to database because it is not new.'));
 
 		if (is_null($this->beforeSaveFunction) || $this->owner->{$this->beforeSaveFunction}(new CModelEvent($this))) {
-			Yii::trace(get_class($this->owner) . '.insertDelayed()', 'application.behaviors.InsertDelayedBehavior');
+			Yii::trace(get_class($this->owner) . '.insertDelayed()', 'InsertDelayedBehavior');
 			$builder = $this->owner->getCommandBuilder();
 			$table = $this->owner->getMetaData()->tableSchema;
 			$command = $builder->createInsertCommand($table, $this->owner->getAttributes());
@@ -54,7 +55,7 @@ class InsertDelayedBehavior extends CActiveRecordBehavior
 						$execParams[$params[$i]] = 'NULL';
 				}
 			} else {
-				Yii::log(get_class($this->owner) . '.insertDelayed() - Cannot insert because of query does not match a regular expression', CLogger::LEVEL_ERROR, 'application.behaviors.InsertDelayedBehavior');
+				Yii::log(get_class($this->owner) . '.insertDelayed() - Cannot insert because query does not match a regular expression', CLogger::LEVEL_ERROR, 'InsertDelayedBehavior');
 				if ($this->onFailSimpleInsert)
 					return $this->owner->insert($attributes);
 				return false;
