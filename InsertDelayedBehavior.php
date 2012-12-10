@@ -23,6 +23,12 @@ class InsertDelayedBehavior extends CActiveRecordBehavior
 	 */
 	public $onFailSimpleInsert = true;
 
+	/**
+	 * Properties is fully similar to CActiveRecord::save()
+	 * @param bool $runValidation
+	 * @param mixed $attributes
+	 * @return bool
+	 */
 	public function saveDelayed($runValidation = true, $attributes = null)
 	{
 		if (!$runValidation || $this->owner->validate($attributes))
@@ -31,13 +37,19 @@ class InsertDelayedBehavior extends CActiveRecordBehavior
 			return false;
 	}
 
+	/**
+	 * Don't call this method directly. Use saveDelayed()
+	 * @param mixed $attributes
+	 * @return bool
+	 * @throws CDbException
+	 */
 	public function insertDelayed($attributes)
 	{
 		if (!$this->owner->getIsNewRecord())
 			throw new CDbException(Yii::t('yii', 'The active record cannot be inserted to database because it is not new.'));
 
 		if (is_null($this->beforeSaveFunction) || $this->owner->{$this->beforeSaveFunction}(new CModelEvent($this))) {
-			Yii::trace(get_class($this->owner) . '.insertDelayed()', 'InsertDelayedBehavior');
+			Yii::trace(get_class($this->owner) . '.InsertDelayedBehavior.insertDelayed()', 'InsertDelayedBehavior');
 			$builder = $this->owner->getCommandBuilder();
 			$table = $this->owner->getMetaData()->tableSchema;
 			$command = $builder->createInsertCommand($table, $this->owner->getAttributes());
@@ -55,7 +67,7 @@ class InsertDelayedBehavior extends CActiveRecordBehavior
 						$execParams[$params[$i]] = 'NULL';
 				}
 			} else {
-				Yii::log(get_class($this->owner) . '.insertDelayed() - Cannot insert because query does not match a regular expression', CLogger::LEVEL_ERROR, 'InsertDelayedBehavior');
+				Yii::log(get_class($this->owner) . '.InsertDelayedBehavior.insertDelayed() - Cannot insert because query does not match a regular expression', CLogger::LEVEL_ERROR, 'InsertDelayedBehavior');
 				if ($this->onFailSimpleInsert)
 					return $this->owner->insert($attributes);
 				return false;
@@ -64,6 +76,13 @@ class InsertDelayedBehavior extends CActiveRecordBehavior
 				$this->owner->setIsNewRecord(false);
 				$this->owner->setScenario('update');
 				return is_null($this->afterSaveFunction) || $this->owner->{$this->afterSaveFunction}(new CModelEvent($this));
+			}
+			else
+			{
+				Yii::log(get_class($this->owner) . '.InsertDelayedBehavior.insertDelayed() - Execution of query failed. It seems like you using not MyISAM MySQL Engine', CLogger::LEVEL_ERROR, 'InsertDelayedBehavior');
+				if ($this->onFailSimpleInsert)
+					return $this->owner->insert($attributes);
+				return false;
 			}
 		}
 		return false;
