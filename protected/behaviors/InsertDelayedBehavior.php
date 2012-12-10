@@ -4,14 +4,16 @@
  * Author: Anatoly Rugalev <anatoly.rugalev@gmail.com>
  * Github: http://github.com/AnatolyRugalev/yii-insertDelayedBehavior
  * Version: 0.1.1
- */ 
-class InsertDelayedBehavior extends CBehavior {
+ */
+class InsertDelayedBehavior extends CActiveRecordBehavior {
     /**
-     * @var string|null name of function to call before save or null to not call
+     * @var string|null name of function to call before save or null to not call.
+     * function requires an $event parameter {@link http://www.yiiframework.com/doc/api/1.1/CActiveRecordBehavior#beforeSave-detail}
      */
     public $beforeSaveFunction = 'beforeSave';
     /**
      * @var string|null name of function to call after save or null to not call
+     * function requires an $event parameter {@link http://www.yiiframework.com/doc/api/1.1/CActiveRecordBehavior#afterSave-detail}
      */
     public $afterSaveFunction = null;
     /**
@@ -31,7 +33,8 @@ class InsertDelayedBehavior extends CBehavior {
     {
         if(!$this->owner->getIsNewRecord())
             throw new CDbException(Yii::t('yii','The active record cannot be inserted to database because it is not new.'));
-        if(is_null($this->beforeSaveFunction) || $this->owner->{$this->beforeSaveFunction}())
+
+        if(is_null($this->beforeSaveFunction) || $this->owner->{$this->beforeSaveFunction}(new CModelEvent($this)))
         {
             Yii::trace(get_class($this->owner).'.insertDelayed()','application.behaviors.InsertDelayedBehavior');
             $builder=$this->owner->getCommandBuilder();
@@ -64,7 +67,7 @@ class InsertDelayedBehavior extends CBehavior {
             {
                 $this->owner->setIsNewRecord(false);
                 $this->owner->setScenario('update');
-                return is_null($this->afterSaveFunction) || $this->owner->{$this->afterSaveFunction}();
+                return is_null($this->afterSaveFunction) || $this->owner->{$this->afterSaveFunction}(new CModelEvent($this));
             }
         }
         return false;
