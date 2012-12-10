@@ -1,9 +1,16 @@
 Yii Insert Delayed Behavior
-=========================
+============================
 
 This behavior allows to save model with INSERT DELAYED.
 
-Usage:
+Installation
+---------------
+Place files in this repository under application/extensions/behaviors
+
+
+Usage
+--------
+Define `behaviors()` method in your ActiveRecord mode as follows:
 
 Model.php
 ```php
@@ -11,7 +18,7 @@ public function behaviors()
 {
 	return array(
 		'saveDelayed' => array(
-			'class' => 'application.behaviors.InsertDelayedBehavior'
+			'class' => 'ext.behaviors.insert-delayed.InsertDelayedBehavior'
 			'afterSaveFunction' => 'afterSave',
 			'beforeSaveFunction' => 'beforeSave', 
 			'onFailSimpleInsert' => true,
@@ -19,6 +26,7 @@ public function behaviors()
 	);
 }
 ```
+and now you can call `saveDelayed()` instead of `save()` inside controller:
 
 Controller.php
 ```php
