@@ -98,6 +98,9 @@ class InsertDelayedBehavior extends CActiveRecordBehavior
 	public function log($message, $level = CLogger::LEVEL_ERROR)
 	{
         //setup owner to name of model behavior is being executed against.
+        //We calculate this everytime log() is called, bad practice? As this would
+        // be same across an instance's lifespace so what if we use an instance variable
+        // and initialize that in init? Think over it.
         $owner = get_class($this->owner);
 
         //get details about caller, such as class and function name.
