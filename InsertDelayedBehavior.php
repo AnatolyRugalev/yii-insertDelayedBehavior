@@ -49,7 +49,7 @@ class InsertDelayedBehavior extends CActiveRecordBehavior
 			throw new CDbException(Yii::t('yii', 'The active record cannot be inserted to database because it is not new.'));
 
 		if (is_null($this->beforeSaveFunction) || $this->owner->{$this->beforeSaveFunction}(new CModelEvent($this))) {
-			Yii::trace(get_class($this->owner) . '.InsertDelayedBehavior.insertDelayed()', 'InsertDelayedBehavior');
+			$this->log('Applying insert delayed', CLogger::LEVEL_TRACE);
 			$builder = $this->owner->getCommandBuilder();
 			$table = $this->owner->getMetaData()->tableSchema;
 			$command = $builder->createInsertCommand($table, $this->owner->getAttributes());
@@ -67,7 +67,7 @@ class InsertDelayedBehavior extends CActiveRecordBehavior
 						$execParams[$params[$i]] = 'NULL';
 				}
 			} else {
-				Yii::log(get_class($this->owner) . '.InsertDelayedBehavior.insertDelayed() - Cannot insert because query does not match a regular expression', CLogger::LEVEL_ERROR, 'InsertDelayedBehavior');
+				$this->log('Cannot insert because query does not match a regular expression', CLogger::LEVEL_ERROR);
 				if ($this->onFailSimpleInsert)
 					return $this->owner->insert($attributes);
 				return false;
@@ -79,7 +79,7 @@ class InsertDelayedBehavior extends CActiveRecordBehavior
 			}
 			else
 			{
-				Yii::log(get_class($this->owner) . '.InsertDelayedBehavior.insertDelayed() - Execution of query failed. It seems like you using not MyISAM MySQL Engine', CLogger::LEVEL_ERROR, 'InsertDelayedBehavior');
+				$this->log('Execution of query failed. It seems like you using not MyISAM MySQL Engine', CLogger::LEVEL_ERROR);
 				if ($this->onFailSimpleInsert)
 					return $this->owner->insert($attributes);
 				return false;
@@ -87,6 +87,34 @@ class InsertDelayedBehavior extends CActiveRecordBehavior
 		}
 		return false;
 	}
+
+
+
+	/**
+     * Logs a message.
+     * @param string $message message to be logged
+     * @param type $level A valid CLogger Level or Null(defaults to LEVEL_ERROR)
+     */
+	public function log($message, $level = CLogger::LEVEL_ERROR)
+	{
+        //setup owner to name of model behavior is being executed against.
+        $owner = get_class($this->owner);
+
+        //get details about caller, such as class and function name.
+        $trace = debug_backtrace();
+        $caller = $trace[1];
+
+        //logger category
+        $category = "{$caller['class']}.{$caller['function']}";
+
+        //add prefix to message.
+        //append .{$category}() after $owner if class and function names shall also appear in log message,
+        // not really needed though as we can already see the category in log statements on any logger.
+        $message = "{$owner}".(($message)?' - '.$message:$message); 
+
+        //time to do some real work
+        Yii::log($message, $level, $category);
+    }
 
 
 }
