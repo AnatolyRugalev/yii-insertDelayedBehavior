@@ -19,8 +19,8 @@ public function behaviors()
 	return array(
 		'saveDelayed' => array(
 			'class' => 'ext.behaviors.insert-delayed.InsertDelayedBehavior'
-			'afterSaveFunction' => 'afterSave',
-			'beforeSaveFunction' => 'beforeSave', 
+			'callBeforeSave' => true,
+			'callAfterSave' => false,
 			'onFailSimpleInsert' => true,
 		);
 	);
@@ -37,6 +37,9 @@ public function saveModel($model)
 	...
 }
 ```
+
+***```INSERT DELAYED``` doesn't allowed for InnoDB tables***
+
 ***By default afterSave function call is disabled. If you specify a function to call after save, you can't get there primary key of inserted model.***
 
 Note that INSERT DELAYED is possible only when model just created.
