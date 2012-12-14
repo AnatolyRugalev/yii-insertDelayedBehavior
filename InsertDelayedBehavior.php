@@ -56,13 +56,18 @@ class InsertDelayedBehavior extends CActiveRecordBehavior {
                 $fields = explode(',', $matches[1]);
                 $params = explode(',', $matches[2]);
                 $execParams = array();
-                
-                foreach ($fields as $i => $field) {
-                    $field = trim($field, '` ');
-                    $params[$i] = trim($params[$i], '` ');
-                    if ($this->owner->hasAttribute($field)) $execParams[$params[$i]] = $this->owner->$field;
-                    else $execParams[$params[$i]] = 'NULL';
-                }
+
+				foreach ($fields as $i => $field) {
+					$field = trim($field, '` ');
+					$params[$i] = trim($params[$i], '` ');
+					if(preg_match('#^:yp[0-9]+$#is', $params[$i]))  //if it really parameter, not an expression
+					{
+						if ($this->owner->hasAttribute($field))
+							$execParams[$params[$i]] = $this->owner->$field;
+						else
+							$execParams[$params[$i]] = 'NULL';
+					}
+				}
             } else {
                 $this->log('Cannot insert because query does not match a regular expression', CLogger::LEVEL_ERROR);
                 if ($this->onFailSimpleInsert) 
